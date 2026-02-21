@@ -351,6 +351,15 @@ async def get_comments(submission_id: str):
     
     return comments
 
+@api_router.delete("/comments/{comment_id}")
+async def delete_comment(comment_id: str, username: str = Depends(verify_token)):
+    result = await db.comments.delete_one({"id": comment_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Comment not found")
+    
+    return {"message": "Comment deleted successfully", "deleted_id": comment_id}
+
 app.include_router(api_router)
 
 app.add_middleware(
