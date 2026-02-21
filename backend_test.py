@@ -487,6 +487,8 @@ class JNVEditorialAPITester:
         )
         
         return success1 and success2 and success3 and success4 and success5
+
+    def run_all_tests(self):
         """Run all API tests in sequence"""
         print("🚀 Starting JNV Editorial Club API Tests")
         print(f"📍 Testing against: {self.base_url}")
