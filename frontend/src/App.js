@@ -532,10 +532,22 @@ function WorkDetail() {
                 comments.map(comment => (
                   <div key={comment.id} className="bg-white border-2 border-black p-4 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]" data-testid={`comment-${comment.id}`}>
                     <div className="flex justify-between items-start mb-2">
-                      <p className="font-bold" style={{fontFamily: 'Space Grotesk'}}>{comment.author_name}</p>
-                      <p className="text-sm text-gray-600" style={{fontFamily: 'Space Grotesk'}}>
-                        {new Date(comment.created_at).toLocaleDateString('en-IN')}
-                      </p>
+                      <div>
+                        <p className="font-bold" style={{fontFamily: 'Space Grotesk'}}>{comment.author_name}</p>
+                        <p className="text-sm text-gray-600" style={{fontFamily: 'Space Grotesk'}}>
+                          {new Date(comment.created_at).toLocaleDateString('en-IN')}
+                        </p>
+                      </div>
+                      {isAdmin && (
+                        <button
+                          onClick={() => handleDeleteComment(comment.id)}
+                          className="bg-[#FF0055] text-white px-3 py-1 text-sm font-bold border-2 border-black hover:bg-[#e6004d] transition-all"
+                          style={{fontFamily: 'Space Grotesk'}}
+                          data-testid={`delete-comment-${comment.id}`}
+                        >
+                          Delete
+                        </button>
+                      )}
                     </div>
                     <p className="whitespace-pre-wrap" style={{fontFamily: 'Space Grotesk'}}>{comment.comment_text}</p>
                   </div>
