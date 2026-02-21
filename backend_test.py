@@ -384,6 +384,10 @@ class JNVEditorialAPITester:
         self.test_search_functionality()
         self.test_student_profile()
         
+        # New feature tests for iteration 3 (Social engagement)
+        self.test_like_functionality()
+        self.test_comment_functionality()
+        
         # Final summary
         print("=" * 60)
         print(f"📊 TEST SUMMARY")
