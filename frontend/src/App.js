@@ -325,21 +325,70 @@ function Browse() {
 function WorkDetail() {
   const { id } = useParams();
   const [work, setWork] = useState(null);
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState({ author_name: '', comment_text: '' });
+  const [likes, setLikes] = useState(0);
+  const [userLiked, setUserLiked] = useState(false);
+  const [showShareMenu, setShowShareMenu] = useState(false);
   const navigate = useNavigate();
+  const userId = getUserId();
 
   useEffect(() => {
     const fetchWork = async () => {
       try {
         const response = await axios.get(`${API}/submissions/${id}`);
         setWork(response.data);
+        setLikes(response.data.likes || 0);
+        setUserLiked(response.data.liked_by?.includes(userId) || false);
       } catch (error) {
         console.error('Error fetching work:', error);
         toast.error('Work not found');
         navigate('/browse');
       }
     };
+    
+    const fetchComments = async () => {
+      try {
+        const response = await axios.get(`${API}/submissions/${id}/comments`);
+        setComments(response.data);
+      } catch (error) {
+        console.error('Error fetching comments:', error);
+      }
+    };
+    
     fetchWork();
-  }, [id, navigate]);
+    fetchComments();
+  }, [id, navigate, userId]);
+
+  const handleLike = async () => {
+    try {
+      const response = await axios.post(`${API}/submissions/${id}/like`, { user_id: userId });
+      setLikes(response.data.likes);
+      setUserLiked(response.data.user_liked);
+      toast.success(response.data.action === 'liked' ? 'Liked!' : 'Like removed');
+    } catch (error) {
+      console.error('Error liking work:', error);
+      toast.error('Failed to like work');
+    }
+  };
+
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    if (!newComment.author_name.trim() || !newComment.comment_text.trim()) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+    
+    try {
+      const response = await axios.post(`${API}/submissions/${id}/comment`, newComment);
+      setComments([response.data, ...comments]);
+      setNewComment({ author_name: '', comment_text: '' });
+      toast.success('Comment added!');
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      toast.error('Failed to add comment');
+    }
+  };
 
   if (!work) return <div className="min-h-screen flex items-center justify-center" style={{backgroundColor: '#F4F1EA'}}><p className="text-xl" style={{fontFamily: 'Space Grotesk'}}>Loading...</p></div>;
 
@@ -350,8 +399,40 @@ function WorkDetail() {
         <button onClick={() => navigate('/browse')} className="mb-8 text-lg font-semibold hover:text-[#FF0055] transition-colors" style={{fontFamily: 'Space Grotesk'}} data-testid="back-button">← Back to Browse</button>
         
         <div className="bg-white border-2 border-black p-8 md:p-12 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]" data-testid="work-content">
-          <div className="flex justify-between items-start mb-6">
+          <div className="flex justify-between items-start mb-6 flex-wrap gap-4">
             <span className="bg-[#3366FF] text-white px-4 py-2 text-sm uppercase tracking-wider border border-black transform -rotate-1" style={{fontFamily: 'Space Grotesk'}} data-testid="work-category">{work.category}</span>
+            
+            <div className="flex gap-3">
+              <button
+                onClick={handleLike}
+                className={`${userLiked ? 'bg-[#FF0055] text-white' : 'bg-white text-black'} px-6 py-2 font-bold border-2 border-black hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center gap-2`}
+                style={{fontFamily: 'Space Grotesk'}}
+                data-testid="like-button"
+              >
+                {userLiked ? '❤' : '♡'} {likes}
+              </button>
+              
+              <div className="relative">
+                <button
+                  onClick={() => setShowShareMenu(!showShareMenu)}
+                  className="bg-[#CCFF00] text-black px-6 py-2 font-bold border-2 border-black hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all"
+                  style={{fontFamily: 'Space Grotesk'}}
+                  data-testid="share-button"
+                >
+                  Share
+                </button>
+                
+                {showShareMenu && (
+                  <div className="absolute right-0 mt-2 bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 z-10 min-w-[200px]" data-testid="share-menu">
+                    <button onClick={() => { shareWork(work, 'facebook'); setShowShareMenu(false); }} className="block w-full text-left px-4 py-2 hover:bg-[#CCFF00] transition-colors font-semibold" style={{fontFamily: 'Space Grotesk'}} data-testid="share-facebook">Facebook</button>
+                    <button onClick={() => { shareWork(work, 'twitter'); setShowShareMenu(false); }} className="block w-full text-left px-4 py-2 hover:bg-[#CCFF00] transition-colors font-semibold" style={{fontFamily: 'Space Grotesk'}} data-testid="share-twitter">Twitter</button>
+                    <button onClick={() => { shareWork(work, 'whatsapp'); setShowShareMenu(false); }} className="block w-full text-left px-4 py-2 hover:bg-[#CCFF00] transition-colors font-semibold" style={{fontFamily: 'Space Grotesk'}} data-testid="share-whatsapp">WhatsApp</button>
+                    <button onClick={() => { shareWork(work, 'linkedin'); setShowShareMenu(false); }} className="block w-full text-left px-4 py-2 hover:bg-[#CCFF00] transition-colors font-semibold" style={{fontFamily: 'Space Grotesk'}} data-testid="share-linkedin">LinkedIn</button>
+                    <button onClick={() => { shareWork(work, 'copy'); setShowShareMenu(false); }} className="block w-full text-left px-4 py-2 hover:bg-[#CCFF00] transition-colors font-semibold" style={{fontFamily: 'Space Grotesk'}} data-testid="share-copy">Copy Link</button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
           
           <h1 className="text-4xl md:text-6xl font-bold mb-4" style={{fontFamily: 'Syne'}} data-testid="work-title">{work.title}</h1>
@@ -372,10 +453,69 @@ function WorkDetail() {
           </div>
           
           {work.content_hi && (
-            <div className="prose max-w-none border-t-2 border-black pt-8">
+            <div className="prose max-w-none border-t-2 border-black pt-8 mb-8">
               <div className="whitespace-pre-wrap text-lg md:text-xl leading-relaxed" style={{fontFamily: 'Rozha One', fontSize: '1.3rem'}} data-testid="work-content-hindi">{work.content_hi}</div>
             </div>
           )}
+          
+          <div className="border-t-2 border-black pt-8">
+            <h3 className="text-3xl font-bold mb-6" style={{fontFamily: 'Syne'}} data-testid="comments-title">Comments ({comments.length})</h3>
+            
+            <form onSubmit={handleCommentSubmit} className="mb-8 bg-[#F4F1EA] border-2 border-black p-6 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]" data-testid="comment-form">
+              <div className="mb-4">
+                <label className="block text-sm font-bold uppercase tracking-wider mb-2" style={{fontFamily: 'Space Grotesk'}}>Your Name / आपका नाम *</label>
+                <input
+                  type="text"
+                  required
+                  value={newComment.author_name}
+                  onChange={(e) => setNewComment(prev => ({ ...prev, author_name: e.target.value }))}
+                  className="w-full bg-white border-2 border-black p-3 focus:outline-none focus:ring-2 focus:ring-[#CCFF00] focus:border-black"
+                  style={{fontFamily: 'Space Grotesk'}}
+                  data-testid="comment-name-input"
+                />
+              </div>
+              
+              <div className="mb-4">
+                <label className="block text-sm font-bold uppercase tracking-wider mb-2" style={{fontFamily: 'Space Grotesk'}}>Your Comment / आपकी टिप्पणी *</label>
+                <textarea
+                  required
+                  rows="4"
+                  value={newComment.comment_text}
+                  onChange={(e) => setNewComment(prev => ({ ...prev, comment_text: e.target.value }))}
+                  className="w-full bg-white border-2 border-black p-3 focus:outline-none focus:ring-2 focus:ring-[#CCFF00] focus:border-black"
+                  style={{fontFamily: 'Space Grotesk'}}
+                  data-testid="comment-text-input"
+                />
+              </div>
+              
+              <button
+                type="submit"
+                className="bg-[#3366FF] text-white px-6 py-3 font-bold border-2 border-black hover:bg-[#2952cc] transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
+                style={{fontFamily: 'Space Grotesk'}}
+                data-testid="comment-submit-button"
+              >
+                Post Comment
+              </button>
+            </form>
+            
+            <div className="space-y-4" data-testid="comments-list">
+              {comments.length === 0 ? (
+                <p className="text-gray-600" style={{fontFamily: 'Space Grotesk'}} data-testid="no-comments">No comments yet. Be the first to comment!</p>
+              ) : (
+                comments.map(comment => (
+                  <div key={comment.id} className="bg-white border-2 border-black p-4 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]" data-testid={`comment-${comment.id}`}>
+                    <div className="flex justify-between items-start mb-2">
+                      <p className="font-bold" style={{fontFamily: 'Space Grotesk'}}>{comment.author_name}</p>
+                      <p className="text-sm text-gray-600" style={{fontFamily: 'Space Grotesk'}}>
+                        {new Date(comment.created_at).toLocaleDateString('en-IN')}
+                      </p>
+                    </div>
+                    <p className="whitespace-pre-wrap" style={{fontFamily: 'Space Grotesk'}}>{comment.comment_text}</p>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>
