@@ -67,6 +67,7 @@ function Header() {
         </Link>
         <nav className="flex items-center gap-4">
           <Link to="/browse" className="font-semibold hover:text-[#FF0055] transition-colors" data-testid="browse-link" style={{fontFamily: 'Space Grotesk'}}>Browse</Link>
+          <Link to="/gallery" className="font-semibold hover:text-[#FF0055] transition-colors" data-testid="gallery-link" style={{fontFamily: 'Space Grotesk'}}>Gallery</Link>
           <Link to="/submit" className="font-semibold hover:text-[#FF0055] transition-colors" data-testid="submit-link" style={{fontFamily: 'Space Grotesk'}}>Submit</Link>
           {isAdmin ? (
             <>
