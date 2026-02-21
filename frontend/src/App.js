@@ -51,19 +51,22 @@ function Header() {
 
 function Home() {
   const [featured, setFeatured] = useState([]);
+  const [showAll, setShowAll] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
         const response = await axios.get(`${API}/submissions?status=approved`);
-        setFeatured(response.data.slice(0, 6));
+        setFeatured(response.data);
       } catch (error) {
         console.error('Error fetching featured works:', error);
       }
     };
     fetchFeatured();
   }, []);
+
+  const displayedWorks = showAll ? featured : featured.slice(0, 6);
 
   return (
     <div className="min-h-screen" style={{backgroundColor: '#F4F1EA'}} data-testid="home-page">
