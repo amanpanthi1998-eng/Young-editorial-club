@@ -202,6 +202,18 @@ function Browse() {
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-12">
         <h1 className="text-5xl md:text-7xl font-bold mb-8" style={{fontFamily: 'Syne'}} data-testid="browse-title">Browse Works</h1>
         
+        <div className="mb-8" data-testid="search-section">
+          <input
+            type="text"
+            placeholder="Search by title, content, or author name... / शीर्षक, सामग्री या लेखक नाम से खोजें..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-white border-2 border-black p-4 text-lg focus:outline-none focus:ring-2 focus:ring-[#CCFF00] focus:border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,0.5)]"
+            style={{fontFamily: 'Space Grotesk'}}
+            data-testid="search-input"
+          />
+        </div>
+        
         <div className="flex gap-4 mb-8 flex-wrap" data-testid="filter-section">
           <select
             value={filter.category}
@@ -226,9 +238,24 @@ function Browse() {
             <option value="hindi">Hindi</option>
             <option value="both">Both</option>
           </select>
+          
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="bg-[#FF0055] text-white px-6 py-3 font-bold border-2 border-black hover:bg-[#e6004d] transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,0.5)]"
+              style={{fontFamily: 'Space Grotesk'}}
+              data-testid="clear-search-button"
+            >
+              Clear Search
+            </button>
+          )}
         </div>
 
-        {works.length === 0 ? (
+        {searching ? (
+          <div className="bg-white border-2 border-black p-12 text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <p className="text-xl" style={{fontFamily: 'Space Grotesk'}}>Searching...</p>
+          </div>
+        ) : works.length === 0 ? (
           <div className="bg-white border-2 border-black p-12 text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" data-testid="no-results-message">
             <p className="text-xl" style={{fontFamily: 'Space Grotesk'}}>No works found with current filters.</p>
           </div>
