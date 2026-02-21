@@ -654,6 +654,228 @@ function StudentProfile() {
   );
 }
 
+function Gallery() {
+  const [items, setItems] = useState([]);
+  const [filter, setFilter] = useState('all');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchGallery = async () => {
+      try {
+        const response = await axios.get(`${API}/gallery?status=approved`);
+        setItems(response.data);
+      } catch (error) {
+        console.error('Error fetching gallery:', error);
+      }
+    };
+    fetchGallery();
+  }, []);
+
+  const filteredItems = filter === 'all' ? items : items.filter(item => item.media_type === filter);
+
+  return (
+    <div className="min-h-screen" style={{backgroundColor: '#F4F1EA'}} data-testid="gallery-page">
+      <Header />
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-12">
+        <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
+          <h1 className="text-5xl md:text-7xl font-bold" style={{fontFamily: 'Syne'}} data-testid="gallery-title">Gallery</h1>
+          <Link to="/gallery/upload" className="bg-[#CCFF00] text-black px-6 py-3 font-bold border-2 border-black hover:bg-[#FF0055] hover:text-white transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]" style={{fontFamily: 'Space Grotesk'}} data-testid="upload-gallery-link">Upload Media</Link>
+        </div>
+
+        <div className="flex gap-4 mb-8" data-testid="gallery-filters">
+          <button
+            onClick={() => setFilter('all')}
+            className={`${filter === 'all' ? 'bg-black text-white' : 'bg-white text-black'} px-6 py-2 font-bold border-2 border-black transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,0.5)]`}
+            style={{fontFamily: 'Space Grotesk'}}
+            data-testid="filter-all"
+          >All</button>
+          <button
+            onClick={() => setFilter('image')}
+            className={`${filter === 'image' ? 'bg-black text-white' : 'bg-white text-black'} px-6 py-2 font-bold border-2 border-black transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,0.5)]`}
+            style={{fontFamily: 'Space Grotesk'}}
+            data-testid="filter-images"
+          >Photos</button>
+          <button
+            onClick={() => setFilter('video')}
+            className={`${filter === 'video' ? 'bg-black text-white' : 'bg-white text-black'} px-6 py-2 font-bold border-2 border-black transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,0.5)]`}
+            style={{fontFamily: 'Space Grotesk'}}
+            data-testid="filter-videos"
+          >Videos</button>
+        </div>
+
+        {filteredItems.length === 0 ? (
+          <div className="bg-white border-2 border-black p-12 text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" data-testid="no-gallery-items">
+            <p className="text-xl" style={{fontFamily: 'Space Grotesk'}}>No media items yet. Be the first to upload!</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="gallery-grid">
+            {filteredItems.map(item => (
+              <div key={item.id} className="bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all overflow-hidden" data-testid={`gallery-item-${item.id}`}>
+                {item.media_type === 'image' ? (
+                  <img src={item.media_url} alt={item.title} className="w-full h-64 object-cover border-b-2 border-black" />
+                ) : (
+                  <video controls className="w-full h-64 object-cover border-b-2 border-black">
+                    <source src={item.media_url} type="video/mp4" />
+                  </video>
+                )}
+                <div className="p-4">
+                  <h3 className="text-xl font-bold mb-1" style={{fontFamily: 'Syne'}}>{item.title}</h3>
+                  {item.title_hi && <p className="text-lg mb-2" style={{fontFamily: 'Rozha One'}}>{item.title_hi}</p>}
+                  {item.description && <p className="text-sm text-gray-700 mb-2" style={{fontFamily: 'Space Grotesk'}}>{item.description}</p>}
+                  <p className="text-xs text-gray-600" style={{fontFamily: 'Space Grotesk'}}>Uploaded by {item.uploaded_by}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function UploadGallery() {
+  const [formData, setFormData] = useState({
+    title: '',
+    title_hi: '',
+    description: '',
+    description_hi: '',
+    media_url: '',
+    media_type: 'image',
+    uploaded_by: ''
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    
+    try {
+      await axios.post(`${API}/gallery`, formData);
+      toast.success('Media uploaded successfully! Awaiting admin approval.');
+      navigate('/gallery');
+    } catch (error) {
+      console.error('Error uploading media:', error);
+      toast.error('Failed to upload media');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen" style={{backgroundColor: '#F4F1EA'}} data-testid="upload-gallery-page">
+      <Header />
+      <div className="max-w-3xl mx-auto px-4 md:px-8 py-12">
+        <h1 className="text-5xl md:text-7xl font-bold mb-4" style={{fontFamily: 'Syne'}} data-testid="upload-title">Upload Media</h1>
+        <p className="text-lg mb-8" style={{fontFamily: 'Space Grotesk'}}>मीडिया अपलोड करें</p>
+        
+        <form onSubmit={handleSubmit} className="bg-white border-2 border-black p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]" data-testid="gallery-upload-form">
+          <div className="mb-6">
+            <label className="block text-sm font-bold uppercase tracking-wider mb-2" style={{fontFamily: 'Space Grotesk'}}>Your Name / आपका नाम *</label>
+            <input
+              type="text"
+              required
+              value={formData.uploaded_by}
+              onChange={(e) => setFormData(prev => ({ ...prev, uploaded_by: e.target.value }))}
+              className="w-full bg-white border-2 border-black p-3 focus:outline-none focus:ring-2 focus:ring-[#CCFF00] focus:border-black"
+              style={{fontFamily: 'Space Grotesk'}}
+              data-testid="uploader-name-input"
+            />
+          </div>
+          
+          <div className="mb-6">
+            <label className="block text-sm font-bold uppercase tracking-wider mb-2" style={{fontFamily: 'Space Grotesk'}}>Media Type *</label>
+            <select
+              value={formData.media_type}
+              onChange={(e) => setFormData(prev => ({ ...prev, media_type: e.target.value }))}
+              className="w-full bg-white border-2 border-black p-3 focus:outline-none focus:ring-2 focus:ring-[#CCFF00] focus:border-black"
+              style={{fontFamily: 'Space Grotesk'}}
+              data-testid="media-type-select"
+            >
+              <option value="image">Photo</option>
+              <option value="video">Video</option>
+            </select>
+          </div>
+          
+          <div className="mb-6">
+            <label className="block text-sm font-bold uppercase tracking-wider mb-2" style={{fontFamily: 'Space Grotesk'}}>Media URL * (Image/Video Link)</label>
+            <input
+              type="url"
+              required
+              value={formData.media_url}
+              onChange={(e) => setFormData(prev => ({ ...prev, media_url: e.target.value }))}
+              className="w-full bg-white border-2 border-black p-3 focus:outline-none focus:ring-2 focus:ring-[#CCFF00] focus:border-black"
+              style={{fontFamily: 'Space Grotesk'}}
+              placeholder="https://example.com/image.jpg"
+              data-testid="media-url-input"
+            />
+            <p className="text-sm text-gray-600 mt-2" style={{fontFamily: 'Space Grotesk'}}>Upload your media to services like Imgur, ImgBB, or YouTube and paste the link here</p>
+          </div>
+          
+          <div className="mb-6">
+            <label className="block text-sm font-bold uppercase tracking-wider mb-2" style={{fontFamily: 'Space Grotesk'}}>Title (English) *</label>
+            <input
+              type="text"
+              required
+              value={formData.title}
+              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+              className="w-full bg-white border-2 border-black p-3 focus:outline-none focus:ring-2 focus:ring-[#CCFF00] focus:border-black"
+              style={{fontFamily: 'Space Grotesk'}}
+              data-testid="title-input"
+            />
+          </div>
+          
+          <div className="mb-6">
+            <label className="block text-sm font-bold uppercase tracking-wider mb-2" style={{fontFamily: 'Space Grotesk'}}>शीर्षक (हिंदी)</label>
+            <input
+              type="text"
+              value={formData.title_hi}
+              onChange={(e) => setFormData(prev => ({ ...prev, title_hi: e.target.value }))}
+              className="w-full bg-white border-2 border-black p-3 focus:outline-none focus:ring-2 focus:ring-[#CCFF00] focus:border-black"
+              style={{fontFamily: 'Rozha One', fontSize: '1.1rem'}}
+              data-testid="title-hindi-input"
+            />
+          </div>
+          
+          <div className="mb-6">
+            <label className="block text-sm font-bold uppercase tracking-wider mb-2" style={{fontFamily: 'Space Grotesk'}}>Description (English)</label>
+            <textarea
+              rows="4"
+              value={formData.description}
+              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              className="w-full bg-white border-2 border-black p-3 focus:outline-none focus:ring-2 focus:ring-[#CCFF00] focus:border-black"
+              style={{fontFamily: 'Space Grotesk'}}
+              data-testid="description-input"
+            />
+          </div>
+          
+          <div className="mb-6">
+            <label className="block text-sm font-bold uppercase tracking-wider mb-2" style={{fontFamily: 'Space Grotesk'}}>विवरण (हिंदी)</label>
+            <textarea
+              rows="4"
+              value={formData.description_hi}
+              onChange={(e) => setFormData(prev => ({ ...prev, description_hi: e.target.value }))}
+              className="w-full bg-white border-2 border-black p-3 focus:outline-none focus:ring-2 focus:ring-[#CCFF00] focus:border-black"
+              style={{fontFamily: 'Rozha One', fontSize: '1.1rem'}}
+              data-testid="description-hindi-input"
+            />
+          </div>
+          
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full bg-[#CCFF00] text-black px-8 py-4 font-bold text-lg border-2 border-black hover:bg-[#FF0055] hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] disabled:opacity-50"
+            style={{fontFamily: 'Space Grotesk'}}
+            data-testid="submit-gallery-button"
+          >
+            {submitting ? 'Uploading...' : 'Upload Media'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 function Submit() {
   const [formData, setFormData] = useState({
     title: '',
