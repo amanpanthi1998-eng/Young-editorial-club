@@ -7,6 +7,39 @@ import '@/App.css';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// Generate unique user ID for likes
+const getUserId = () => {
+  let userId = localStorage.getItem('user_id');
+  if (!userId) {
+    userId = 'user_' + Math.random().toString(36).substr(2, 9) + Date.now();
+    localStorage.setItem('user_id', userId);
+  }
+  return userId;
+};
+
+// Share functionality
+const shareWork = (work, platform) => {
+  const url = window.location.origin + `/work/${work.id}`;
+  const title = work.title;
+  const text = `Check out "${title}" by ${work.author_name} on JNV Editorial Club`;
+  
+  const shareUrls = {
+    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+    twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
+    whatsapp: `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`,
+    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`
+  };
+  
+  if (platform === 'copy') {
+    navigator.clipboard.writeText(url);
+    toast.success('Link copied to clipboard!');
+  } else if (platform === 'native' && navigator.share) {
+    navigator.share({ title, text, url }).catch(() => {});
+  } else if (shareUrls[platform]) {
+    window.open(shareUrls[platform], '_blank', 'width=600,height=400');
+  }
+};
+
 const categories = [
   { value: 'poem', label: 'Poem', label_hi: 'कविता' },
   { value: 'story', label: 'Story', label_hi: 'कहानी' },
