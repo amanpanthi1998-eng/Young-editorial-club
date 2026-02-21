@@ -300,6 +300,57 @@ async def get_student_profile(author_name: str):
         "works": submissions
     }
 
+@api_router.post("/submissions/{submission_id}/like")
+async def like_submission(submission_id: str, like_req: LikeRequest):
+    submission = await db.submissions.find_one({"id": submission_id}, {"_id": 0})
+    if not submission:
+        raise HTTPException(status_code=404, detail="Submission not found")
+    
+    liked_by = submission.get('liked_by', [])
+    likes = submission.get('likes', 0)
+    
+    if like_req.user_id in liked_by:
+        liked_by.remove(like_req.user_id)
+        likes = max(0, likes - 1)
+        action = "unliked"
+    else:
+        liked_by.append(like_req.user_id)
+        likes += 1
+        action = "liked"
+    
+    await db.submissions.update_one(
+        {"id": submission_id},
+        {"$set": {"likes": likes, "liked_by": liked_by}}
+    )
+    
+    return {"likes": likes, "action": action, "user_liked": like_req.user_id in liked_by}
+
+@api_router.post("/submissions/{submission_id}/comment", response_model=Comment)
+async def add_comment(submission_id: str, comment_data: CommentCreate):
+    submission = await db.submissions.find_one({"id": submission_id}, {"_id": 0})
+    if not submission:
+        raise HTTPException(status_code=404, detail="Submission not found")
+    
+    comment = Comment(submission_id=submission_id, **comment_data.model_dump())
+    doc = comment.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    
+    await db.comments.insert_one(doc)
+    return comment
+
+@api_router.get("/submissions/{submission_id}/comments", response_model=List[Comment])
+async def get_comments(submission_id: str):
+    comments = await db.comments.find(
+        {"submission_id": submission_id}, 
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(1000)
+    
+    for comment in comments:
+        if isinstance(comment.get('created_at'), str):
+            comment['created_at'] = datetime.fromisoformat(comment['created_at'])
+    
+    return comments
+
 app.include_router(api_router)
 
 app.add_middleware(
