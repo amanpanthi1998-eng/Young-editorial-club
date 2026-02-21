@@ -1351,6 +1351,58 @@ function AdminDashboard() {
             ))}
           </div>
         )}
+        </>
+        )}
+        
+        {activeTab === 'gallery' && (
+          <>
+            <h2 className="text-3xl font-bold mb-6" style={{fontFamily: 'Syne'}}>Pending Gallery Items</h2>
+            
+            {pendingGallery.length === 0 ? (
+              <div className="bg-white border-2 border-black p-12 text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" data-testid="no-pending-gallery">
+                <p className="text-xl" style={{fontFamily: 'Space Grotesk'}}>No pending gallery items</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="pending-gallery-list">
+                {pendingGallery.map(item => (
+                  <div key={item.id} className="bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden" data-testid={`pending-gallery-${item.id}`}>
+                    {item.media_type === 'image' ? (
+                      <img src={item.media_url} alt={item.title} className="w-full h-48 object-cover border-b-2 border-black" />
+                    ) : (
+                      <video controls className="w-full h-48 object-cover border-b-2 border-black">
+                        <source src={item.media_url} type="video/mp4" />
+                      </video>
+                    )}
+                    <div className="p-4">
+                      <h3 className="text-lg font-bold mb-1" style={{fontFamily: 'Syne'}}>{item.title}</h3>
+                      {item.title_hi && <p className="text-base mb-2" style={{fontFamily: 'Rozha One'}}>{item.title_hi}</p>}
+                      <p className="text-sm text-gray-600 mb-4" style={{fontFamily: 'Space Grotesk'}}>By {item.uploaded_by}</p>
+                      
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleApproveGallery(item.id)}
+                          className="flex-1 bg-[#CCFF00] text-black px-4 py-2 font-bold border-2 border-black hover:bg-[#b3e600] transition-all"
+                          style={{fontFamily: 'Space Grotesk'}}
+                          data-testid={`approve-gallery-${item.id}`}
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => handleDeleteGallery(item.id)}
+                          className="flex-1 bg-[#FF0055] text-white px-4 py-2 font-bold border-2 border-black hover:bg-[#e6004d] transition-all"
+                          style={{fontFamily: 'Space Grotesk'}}
+                          data-testid={`delete-gallery-${item.id}`}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
