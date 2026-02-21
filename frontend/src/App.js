@@ -108,14 +108,29 @@ function Home() {
       <section className="relative py-20 border-b-2 border-black overflow-hidden" data-testid="hero-section">
         <div className="absolute inset-0 bg-[#3366FF] opacity-10"></div>
         <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
-          <h1 className="text-6xl md:text-8xl font-bold tracking-tighter leading-[0.9] mb-6" style={{fontFamily: 'Syne'}} data-testid="hero-title">
-            Young<br/>Editorial<br/>Club
-          </h1>
-          <p className="text-xl md:text-2xl mb-8 max-w-2xl" style={{fontFamily: 'Space Grotesk'}} data-testid="hero-subtitle">
-            युवा संपादकीय क्लब<br/>
-            Jawahar Navodaya Vidyalaya Sukma
-          </p>
-          <button onClick={() => navigate('/browse')} className="bg-[#CCFF00] text-black px-8 py-4 font-bold text-lg border-2 border-black hover:bg-[#FF0055] hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1" data-testid="explore-button" style={{fontFamily: 'Space Grotesk'}}>Explore Works</button>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h1 className="text-6xl md:text-8xl font-bold tracking-tighter leading-[0.9] mb-6" style={{fontFamily: 'Syne'}} data-testid="hero-title">
+                Young<br/>Editorial<br/>Club
+              </h1>
+              <p className="text-xl md:text-2xl mb-8" style={{fontFamily: 'Space Grotesk'}} data-testid="hero-subtitle">
+                युवा संपादकीय क्लब<br/>
+                Jawahar Navodaya Vidyalaya Sukma
+              </p>
+              <div className="flex gap-4 flex-wrap">
+                <button onClick={() => navigate('/browse')} className="bg-[#CCFF00] text-black px-8 py-4 font-bold text-lg border-2 border-black hover:bg-[#FF0055] hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1" data-testid="explore-button" style={{fontFamily: 'Space Grotesk'}}>Explore Works</button>
+                <button onClick={() => navigate('/gallery')} className="bg-white text-black px-8 py-4 font-bold text-lg border-2 border-black hover:bg-[#3366FF] hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1" data-testid="gallery-button" style={{fontFamily: 'Space Grotesk'}}>View Gallery</button>
+              </div>
+            </div>
+            <div className="border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+              <img 
+                src="https://static.prod-images.emergentagent.com/jobs/0d0a2a6f-effd-4fec-a70e-5aa71a7c9085/images/b584d899eaaac1375072b861dca5f12137eb4560ad5fa70826b2fe734731b368.png" 
+                alt="Students engaged in literary activities" 
+                className="w-full h-auto"
+                data-testid="hero-image"
+              />
+            </div>
+          </div>
         </div>
       </section>
 
