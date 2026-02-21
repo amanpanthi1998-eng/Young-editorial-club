@@ -488,6 +488,89 @@ class JNVEditorialAPITester:
         
         return success1 and success2 and success3 and success4 and success5
 
+    def test_comment_deletion(self):
+        """Test admin comment deletion functionality (NEW for iteration 4)"""
+        if not self.test_submission_id or not self.token:
+            self.log_result("Comment Deletion Test", False, "Missing submission ID or admin token")
+            return False
+            
+        # First, create a comment to delete
+        comment_data = {
+            "author_name": "To Be Deleted",
+            "comment_text": "This comment will be deleted by admin"
+        }
+        
+        success1, response1 = self.run_api_test(
+            "Create Comment for Deletion Test",
+            "POST",
+            f"submissions/{self.test_submission_id}/comment",
+            200,
+            data=comment_data
+        )
+        
+        if not success1 or 'id' not in response1:
+            return False
+            
+        delete_comment_id = response1['id']
+        
+        # Test admin deletion with valid token
+        success2, response2 = self.run_api_test(
+            "Admin Delete Comment",
+            "DELETE",
+            f"comments/{delete_comment_id}",
+            200,
+            headers={'Authorization': f'Bearer {self.token}'}
+        )
+        
+        if success2:
+            message_check = 'deleted successfully' in str(response2.get('message', ''))
+            deleted_id_check = response2.get('deleted_id') == delete_comment_id
+            self.log_result("Delete Response Check", message_check and deleted_id_check,
+                          f"Message: {response2.get('message')}, Deleted ID: {response2.get('deleted_id')}")
+        
+        # Test deletion of non-existent comment
+        success3, _ = self.run_api_test(
+            "Delete Non-existent Comment",
+            "DELETE",
+            "comments/non-existent-comment-id",
+            404,
+            headers={'Authorization': f'Bearer {self.token}'}
+        )
+        
+        # Test deletion without admin token (unauthorized)
+        success4, _ = self.run_api_test(
+            "Unauthorized Comment Deletion",
+            "DELETE",
+            f"comments/some-comment-id",
+            401,
+            headers={}  # No authorization header
+        )
+        
+        # Test deletion with invalid token
+        success5, _ = self.run_api_test(
+            "Invalid Token Comment Deletion",
+            "DELETE",
+            f"comments/some-comment-id",
+            401,
+            headers={'Authorization': 'Bearer invalid-token'}
+        )
+        
+        # Verify the comment was actually deleted by checking comments list
+        success6, response6 = self.run_api_test(
+            "Verify Comment Deletion",
+            "GET",
+            f"submissions/{self.test_submission_id}/comments",
+            200
+        )
+        
+        if success6 and isinstance(response6, list):
+            deleted_comment_still_exists = any(c.get('id') == delete_comment_id for c in response6)
+            self.log_result("Comment Actually Deleted", not deleted_comment_still_exists,
+                          f"Deleted comment still in list: {deleted_comment_still_exists}")
+            success6 = not deleted_comment_still_exists
+        
+        return success1 and success2 and success3 and success4 and success5 and success6
+
     def run_all_tests(self):
         """Run all API tests in sequence"""
         print("🚀 Starting JNV Editorial Club API Tests")
