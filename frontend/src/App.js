@@ -1124,9 +1124,11 @@ function AdminLogin() {
 
 function AdminDashboard() {
   const [pending, setPending] = useState([]);
+  const [pendingGallery, setPendingGallery] = useState([]);
   const [stats, setStats] = useState(null);
   const [selectedSubmission, setSelectedSubmission] = useState(null);
   const [adminNotes, setAdminNotes] = useState('');
+  const [activeTab, setActiveTab] = useState('submissions');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -1143,12 +1145,14 @@ function AdminDashboard() {
     const headers = { Authorization: `Bearer ${token}` };
     
     try {
-      const [pendingRes, statsRes] = await Promise.all([
+      const [pendingRes, statsRes, galleryRes] = await Promise.all([
         axios.get(`${API}/submissions/pending/list`, { headers }),
-        axios.get(`${API}/stats`, { headers })
+        axios.get(`${API}/stats`, { headers }),
+        axios.get(`${API}/gallery/pending`, { headers })
       ]);
       setPending(pendingRes.data);
       setStats(statsRes.data);
+      setPendingGallery(galleryRes.data);
     } catch (error) {
       console.error('Error fetching data:', error);
       if (error.response?.status === 401) {
