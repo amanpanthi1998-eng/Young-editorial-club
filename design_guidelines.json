@@ -1,0 +1,108 @@
+{
+  "brand_identity": {
+    "name": "Young Editorial Club - JNV Sukma",
+    "mission": "To unleash the creative potential of students through a vibrant, digital zine platform.",
+    "aesthetic": "Digital Zine / Neo-Brutalist / Collage",
+    "tone": "Energetic, Raw, Creative, Authentic, Youthful",
+    "archetype": "The Creator / The Rebel",
+    "logo_text": "JNV EDITORIAL",
+    "logo_font": "Syne"
+  },
+  "typography": {
+    "font_family_primary": "Syne",
+    "font_family_secondary": "Space Grotesk",
+    "font_family_hindi": "Rozha One",
+    "scale": {
+      "h1": "text-6xl md:text-8xl font-bold tracking-tighter leading-[0.9]",
+      "h2": "text-4xl md:text-6xl font-bold tracking-tight",
+      "h3": "text-2xl md:text-4xl font-semibold",
+      "body": "text-base md:text-lg leading-relaxed",
+      "caption": "text-sm font-mono uppercase tracking-widest"
+    },
+    "imports": [
+      "https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Grotesk:wght@300;400;600&family=Rozha+One&display=swap"
+    ]
+  },
+  "colors": {
+    "palette": {
+      "background": "#F4F1EA",
+      "foreground": "#1A1A1A",
+      "primary": "#CCFF00",
+      "secondary": "#FF0055",
+      "accent": "#3366FF",
+      "muted": "#E5E5E5",
+      "border": "#000000"
+    },
+    "usage": {
+      "bg_main": "bg-[#F4F1EA]",
+      "text_main": "text-[#1A1A1A]",
+      "accent_neon": "text-[#CCFF00] or bg-[#CCFF00]",
+      "accent_pink": "text-[#FF0055] or bg-[#FF0055]",
+      "border_hard": "border-black border-2"
+    },
+    "theme_mode": "light"
+  },
+  "visual_enhancers": {
+    "borders": "border-2 border-black",
+    "shadows": "shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]",
+    "radius": "rounded-none",
+    "textures": {
+      "paper": "url('https://images.pexels.com/photos/220634/pexels-photo-220634.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940')",
+      "grain": "url('data:image/svg+xml;base64,...')"
+    },
+    "effects": {
+      "hover_lift": "hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all duration-200",
+      "tape_strip": "bg-[#ffdb4d] transform -rotate-2"
+    }
+  },
+  "layout_strategy": {
+    "grid": "grid-cols-12 gap-4 md:gap-8",
+    "container": "max-w-7xl mx-auto px-4 md:px-8",
+    "spacing": "p-4 md:p-8 lg:p-12",
+    "modes": {
+      "gallery": "Bento Grid - Mix of spans (col-span-4, col-span-6, col-span-8)",
+      "article": "Single column text with floating sidebar images"
+    }
+  },
+  "components": {
+    "Button": {
+      "style": "bg-black text-white px-8 py-3 font-bold border-2 border-transparent hover:bg-[#CCFF00] hover:text-black hover:border-black transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]",
+      "variants": {
+        "outline": "bg-transparent border-2 border-black text-black hover:bg-black hover:text-white"
+      }
+    },
+    "Card": {
+      "style": "bg-white border-2 border-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all",
+      "content_style": "space-y-4"
+    },
+    "Badge": {
+      "style": "bg-[#3366FF] text-white px-3 py-1 font-mono text-xs uppercase tracking-wider border border-black transform -rotate-1"
+    },
+    "Input": {
+      "style": "bg-white border-2 border-black p-3 focus:outline-none focus:ring-2 focus:ring-[#CCFF00] focus:border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,0.5)]"
+    }
+  },
+  "image_urls": {
+    "hero_bg": "https://images.pexels.com/photos/18012459/pexels-photo-18012459.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "paper_texture": "https://images.pexels.com/photos/220634/pexels-photo-220634.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "placeholders": [
+      "https://images.pexels.com/photos/14180701/pexels-photo-14180701.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
+    ]
+  },
+  "universal_guidelines": [
+    "Do not use gradients. Use flat, bold colors.",
+    "Do not use rounded corners unless it is a specific 'sticker' element.",
+    "Use 2px black borders for almost all containers.",
+    "Ensure Hindi text (Rozha One) is 10-15% larger than English text for optical balance.",
+    "Animations should be snappy (duration-200), not smooth/slow.",
+    "Use 'marquee' effects for announcements.",
+    "Always use the 'Syne' font for headings.",
+    "In forms, labels should be bold and uppercase."
+  ],
+  "accessibility": {
+    "contrast": "Ensure all text on colored backgrounds meets APCA standards (Black on Neon Yellow is good).",
+    "focus_states": "Focus rings must be thick (2px-4px) and high contrast.",
+    "motion": "Respect prefers-reduced-motion."
+  },
+  "instructions_to_main_agent": "You are building a 'Digital Zine'. Forget standard SaaS dashboards. Think 'Art School Project' meets 'Professional Archive'. Use the 'Syne' font aggressively. Use the 'border-2 border-black' utility everywhere. The 'shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]' is your best friend. Make it raw but usable."
+}
