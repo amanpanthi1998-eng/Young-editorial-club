@@ -161,6 +161,8 @@ function Home() {
 function Browse() {
   const [works, setWorks] = useState([]);
   const [filter, setFilter] = useState({ category: '', language: '' });
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searching, setSearching] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -172,17 +174,27 @@ function Browse() {
   useEffect(() => {
     const fetchWorks = async () => {
       try {
-        const params = new URLSearchParams({ status: 'approved' });
-        if (filter.category) params.append('category', filter.category);
-        if (filter.language) params.append('language', filter.language);
-        const response = await axios.get(`${API}/submissions?${params}`);
-        setWorks(response.data);
+        if (searchQuery.trim().length > 0) {
+          setSearching(true);
+          const response = await axios.get(`${API}/search?q=${encodeURIComponent(searchQuery)}`);
+          setWorks(response.data);
+          setSearching(false);
+        } else {
+          const params = new URLSearchParams({ status: 'approved' });
+          if (filter.category) params.append('category', filter.category);
+          if (filter.language) params.append('language', filter.language);
+          const response = await axios.get(`${API}/submissions?${params}`);
+          setWorks(response.data);
+        }
       } catch (error) {
         console.error('Error fetching works:', error);
+        setSearching(false);
       }
     };
-    fetchWorks();
-  }, [filter]);
+    
+    const debounceTimer = setTimeout(fetchWorks, 300);
+    return () => clearTimeout(debounceTimer);
+  }, [filter, searchQuery]);
 
   return (
     <div className="min-h-screen" style={{backgroundColor: '#F4F1EA'}} data-testid="browse-page">
