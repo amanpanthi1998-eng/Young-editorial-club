@@ -380,6 +380,10 @@ class JNVEditorialAPITester:
         self.test_filter_submissions()
         self.test_reject_submission()
         
+        # New feature tests for iteration 2
+        self.test_search_functionality()
+        self.test_student_profile()
+        
         # Final summary
         print("=" * 60)
         print(f"📊 TEST SUMMARY")
