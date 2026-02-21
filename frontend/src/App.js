@@ -113,24 +113,44 @@ function Home() {
               <p className="text-xl" style={{fontFamily: 'Space Grotesk'}}>No works published yet. Be the first to submit!</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featured.map(work => (
-                <div
-                  key={work.id}
-                  onClick={() => navigate(`/work/${work.id}`)}
-                  className="bg-white border-2 border-black p-6 cursor-pointer shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
-                  data-testid={`featured-work-${work.id}`}
-                >
-                  <div className="flex justify-between items-start mb-4">
-                    <span className="bg-[#3366FF] text-white px-3 py-1 text-xs uppercase tracking-wider border border-black transform -rotate-1" style={{fontFamily: 'Space Grotesk'}}>{work.category}</span>
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {displayedWorks.map(work => (
+                  <div
+                    key={work.id}
+                    className="bg-white border-2 border-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
+                    data-testid={`featured-work-${work.id}`}
+                  >
+                    <div className="flex justify-between items-start mb-4">
+                      <span className="bg-[#3366FF] text-white px-3 py-1 text-xs uppercase tracking-wider border border-black transform -rotate-1" style={{fontFamily: 'Space Grotesk'}}>{work.category}</span>
+                    </div>
+                    <div onClick={() => navigate(`/work/${work.id}`)} className="cursor-pointer">
+                      <h3 className="text-2xl font-bold mb-2" style={{fontFamily: 'Syne'}}>{work.title}</h3>
+                      {work.title_hi && <p className="text-xl mb-3" style={{fontFamily: 'Rozha One', fontSize: '1.3rem'}}>{work.title_hi}</p>}
+                      <p className="text-sm text-gray-700 line-clamp-3 mb-4" style={{fontFamily: 'Space Grotesk'}}>{work.content.substring(0, 150)}...</p>
+                    </div>
+                    <p 
+                      className="text-sm font-semibold cursor-pointer hover:text-[#FF0055] transition-colors" 
+                      style={{fontFamily: 'Space Grotesk'}}
+                      onClick={() => navigate(`/student/${encodeURIComponent(work.author_name)}`)}
+                      data-testid={`author-link-${work.id}`}
+                    >— {work.author_name}, Class {work.author_class}</p>
                   </div>
-                  <h3 className="text-2xl font-bold mb-2" style={{fontFamily: 'Syne'}}>{work.title}</h3>
-                  {work.title_hi && <p className="text-xl mb-3" style={{fontFamily: 'Rozha One', fontSize: '1.3rem'}}>{work.title_hi}</p>}
-                  <p className="text-sm text-gray-700 line-clamp-3 mb-4" style={{fontFamily: 'Space Grotesk'}}>{work.content.substring(0, 150)}...</p>
-                  <p className="text-sm font-semibold" style={{fontFamily: 'Space Grotesk'}}>— {work.author_name}, Class {work.author_class}</p>
+                ))}
+              </div>
+              {featured.length > 6 && (
+                <div className="text-center mt-8">
+                  <button 
+                    onClick={() => setShowAll(!showAll)}
+                    className="bg-black text-white px-8 py-3 font-bold border-2 border-transparent hover:bg-[#CCFF00] hover:text-black hover:border-black transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                    style={{fontFamily: 'Space Grotesk'}}
+                    data-testid="toggle-all-button"
+                  >
+                    {showAll ? 'Show Less' : `View All ${featured.length} Works`}
+                  </button>
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           )}
         </div>
       </section>
