@@ -383,6 +383,70 @@ async def delete_comment(comment_id: str, username: str = Depends(verify_token))
     
     return {"message": "Comment deleted successfully", "deleted_id": comment_id}
 
+@api_router.post("/gallery", response_model=Gallery)
+async def create_gallery_item(item: GalleryCreate):
+    gallery_obj = Gallery(**item.model_dump())
+    doc = gallery_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    await db.gallery.insert_one(doc)
+    return gallery_obj
+
+@api_router.get("/gallery", response_model=List[Gallery])
+async def get_gallery_items(status: Optional[str] = "approved"):
+    query = {"status": status} if status else {}
+    items = await db.gallery.find(query, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    
+    for item in items:
+        if isinstance(item.get('created_at'), str):
+            item['created_at'] = datetime.fromisoformat(item['created_at'])
+        if item.get('approved_at') and isinstance(item['approved_at'], str):
+            item['approved_at'] = datetime.fromisoformat(item['approved_at'])
+    
+    return items
+
+@api_router.get("/gallery/pending", response_model=List[Gallery])
+async def get_pending_gallery(username: str = Depends(verify_token)):
+    items = await db.gallery.find({"status": "pending"}, {"_id": 0}).sort("created_at", 1).to_list(1000)
+    
+    for item in items:
+        if isinstance(item.get('created_at'), str):
+            item['created_at'] = datetime.fromisoformat(item['created_at'])
+    
+    return items
+
+@api_router.patch("/gallery/{item_id}/approve")
+async def approve_gallery_item(item_id: str, username: str = Depends(verify_token)):
+    result = await db.gallery.find_one_and_update(
+        {"id": item_id},
+        {
+            "$set": {
+                "status": "approved",
+                "approved_at": datetime.now(timezone.utc).isoformat()
+            }
+        },
+        projection={"_id": 0},
+        return_document=True
+    )
+    
+    if not result:
+        raise HTTPException(status_code=404, detail="Gallery item not found")
+    
+    if isinstance(result.get('created_at'), str):
+        result['created_at'] = datetime.fromisoformat(result['created_at'])
+    if result.get('approved_at') and isinstance(result['approved_at'], str):
+        result['approved_at'] = datetime.fromisoformat(result['approved_at'])
+    
+    return result
+
+@api_router.delete("/gallery/{item_id}")
+async def delete_gallery_item(item_id: str, username: str = Depends(verify_token)):
+    result = await db.gallery.delete_one({"id": item_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Gallery item not found")
+    
+    return {"message": "Gallery item deleted successfully", "deleted_id": item_id}
+
 app.include_router(api_router)
 
 app.add_middleware(
