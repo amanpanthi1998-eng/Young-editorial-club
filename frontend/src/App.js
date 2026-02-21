@@ -306,6 +306,10 @@ function Browse() {
               >
                 <div className="flex justify-between items-start mb-4">
                   <span className="bg-[#3366FF] text-white px-3 py-1 text-xs uppercase tracking-wider border border-black transform -rotate-1" style={{fontFamily: 'Space Grotesk'}}>{work.category}</span>
+                  <div className="flex items-center gap-1 text-[#FF0055]">
+                    <span>♡</span>
+                    <span className="text-sm font-bold" style={{fontFamily: 'Space Grotesk'}}>{work.likes || 0}</span>
+                  </div>
                 </div>
                 <div onClick={() => navigate(`/work/${work.id}`)} className="cursor-pointer">
                   <h3 className="text-2xl font-bold mb-2" style={{fontFamily: 'Syne'}}>{work.title}</h3>
