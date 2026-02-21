@@ -71,6 +71,29 @@ class CommentCreate(BaseModel):
 class LikeRequest(BaseModel):
     user_id: str
 
+class Gallery(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    title_hi: Optional[str] = None
+    description: Optional[str] = None
+    description_hi: Optional[str] = None
+    media_url: str
+    media_type: Literal["image", "video"]
+    uploaded_by: str
+    status: str = "pending"
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    approved_at: Optional[datetime] = None
+
+class GalleryCreate(BaseModel):
+    title: str
+    title_hi: Optional[str] = None
+    description: Optional[str] = None
+    description_hi: Optional[str] = None
+    media_url: str
+    media_type: Literal["image", "video"]
+    uploaded_by: str
+
 class SubmissionApproval(BaseModel):
     admin_notes: Optional[str] = None
 
