@@ -325,7 +325,12 @@ function WorkDetail() {
           {work.title_hi && <h2 className="text-3xl md:text-5xl mb-6" style={{fontFamily: 'Rozha One', fontSize: '2.5rem'}} data-testid="work-title-hindi">{work.title_hi}</h2>}
           
           <div className="mb-8">
-            <p className="text-lg font-semibold" style={{fontFamily: 'Space Grotesk'}} data-testid="work-author">By {work.author_name}</p>
+            <p 
+              className="text-lg font-semibold cursor-pointer hover:text-[#FF0055] transition-colors inline-block" 
+              style={{fontFamily: 'Space Grotesk'}} 
+              data-testid="work-author"
+              onClick={() => navigate(`/student/${encodeURIComponent(work.author_name)}`)}
+            >By {work.author_name}</p>
             <p className="text-base text-gray-600" style={{fontFamily: 'Space Grotesk'}}>Class {work.author_class}</p>
           </div>
           
@@ -338,6 +343,79 @@ function WorkDetail() {
               <div className="whitespace-pre-wrap text-lg md:text-xl leading-relaxed" style={{fontFamily: 'Rozha One', fontSize: '1.3rem'}} data-testid="work-content-hindi">{work.content_hi}</div>
             </div>
           )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StudentProfile() {
+  const { authorName } = useParams();
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await axios.get(`${API}/students/${encodeURIComponent(authorName)}`);
+        setProfile(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching student profile:', error);
+        toast.error('Student profile not found');
+        navigate('/browse');
+      }
+    };
+    fetchProfile();
+  }, [authorName, navigate]);
+
+  if (loading) return <div className="min-h-screen flex items-center justify-center" style={{backgroundColor: '#F4F1EA'}}><p className="text-xl" style={{fontFamily: 'Space Grotesk'}}>Loading...</p></div>;
+
+  return (
+    <div className="min-h-screen" style={{backgroundColor: '#F4F1EA'}} data-testid="student-profile-page">
+      <Header />
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-12">
+        <button onClick={() => navigate('/browse')} className="mb-8 text-lg font-semibold hover:text-[#FF0055] transition-colors" style={{fontFamily: 'Space Grotesk'}} data-testid="back-button">← Back to Browse</button>
+        
+        <div className="bg-white border-2 border-black p-8 md:p-12 mb-12 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]" data-testid="profile-header">
+          <h1 className="text-5xl md:text-7xl font-bold mb-6" style={{fontFamily: 'Syne'}} data-testid="student-name">{profile.author_name}</h1>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="bg-[#CCFF00] border-2 border-black p-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]" data-testid="total-works-stat">
+              <p className="text-sm font-bold uppercase tracking-wider mb-1" style={{fontFamily: 'Space Grotesk'}}>Total Works</p>
+              <p className="text-3xl font-bold" style={{fontFamily: 'Syne'}}>{profile.total_works}</p>
+            </div>
+            
+            {Object.entries(profile.categories).map(([cat, count]) => (
+              <div key={cat} className="bg-white border-2 border-black p-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]" data-testid={`category-stat-${cat}`}>
+                <p className="text-sm font-bold uppercase tracking-wider mb-1" style={{fontFamily: 'Space Grotesk'}}>{cat}</p>
+                <p className="text-3xl font-bold" style={{fontFamily: 'Syne'}}>{count}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        <h2 className="text-4xl font-bold mb-8" style={{fontFamily: 'Syne'}}>All Works by {profile.author_name}</h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="student-works-grid">
+          {profile.works.map(work => (
+            <div
+              key={work.id}
+              className="bg-white border-2 border-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
+              data-testid={`work-card-${work.id}`}
+            >
+              <div className="flex justify-between items-start mb-4">
+                <span className="bg-[#3366FF] text-white px-3 py-1 text-xs uppercase tracking-wider border border-black transform -rotate-1" style={{fontFamily: 'Space Grotesk'}}>{work.category}</span>
+              </div>
+              <div onClick={() => navigate(`/work/${work.id}`)} className="cursor-pointer">
+                <h3 className="text-2xl font-bold mb-2" style={{fontFamily: 'Syne'}}>{work.title}</h3>
+                {work.title_hi && <p className="text-xl mb-3" style={{fontFamily: 'Rozha One', fontSize: '1.3rem'}}>{work.title_hi}</p>}
+                <p className="text-sm text-gray-700 line-clamp-3 mb-4" style={{fontFamily: 'Space Grotesk'}}>{work.content.substring(0, 150)}...</p>
+                <p className="text-sm text-gray-600" style={{fontFamily: 'Space Grotesk'}}>Class {work.author_class}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
