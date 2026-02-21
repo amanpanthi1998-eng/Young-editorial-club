@@ -53,6 +53,23 @@ class Submission(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     approved_at: Optional[datetime] = None
     admin_notes: Optional[str] = None
+    likes: int = 0
+    liked_by: List[str] = []
+
+class Comment(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    submission_id: str
+    author_name: str
+    comment_text: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class CommentCreate(BaseModel):
+    author_name: str
+    comment_text: str
+
+class LikeRequest(BaseModel):
+    user_id: str
 
 class SubmissionApproval(BaseModel):
     admin_notes: Optional[str] = None
