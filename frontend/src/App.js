@@ -859,6 +859,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/browse" element={<Browse />} />
           <Route path="/work/:id" element={<WorkDetail />} />
+          <Route path="/student/:authorName" element={<StudentProfile />} />
           <Route path="/submit" element={<Submit />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminDashboard />} />
