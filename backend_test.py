@@ -286,6 +286,73 @@ class JNVEditorialAPITester:
         
         return success
 
+    def test_search_functionality(self):
+        """Test search API with different query types"""
+        # Test search with title
+        success1, response1 = self.run_api_test(
+            "Search by Title",
+            "GET",
+            "search?q=Test Poem",
+            200
+        )
+        
+        # Test search with author name
+        success2, response2 = self.run_api_test(
+            "Search by Author",
+            "GET",
+            "search?q=Test Student",
+            200
+        )
+        
+        # Test search with Hindi content
+        success3, response3 = self.run_api_test(
+            "Search Hindi Content",
+            "GET",
+            "search?q=परीक्षा",
+            200
+        )
+        
+        # Test empty search
+        success4, response4 = self.run_api_test(
+            "Empty Search Query",
+            "GET",
+            "search?q=",
+            200
+        )
+        
+        if success4 and isinstance(response4, list):
+            empty_check = len(response4) == 0
+            self.log_result("Empty Search Response Check", empty_check, 
+                          f"Expected empty array, got {len(response4)} items")
+        
+        return success1 and success2 and success3 and success4
+
+    def test_student_profile(self):
+        """Test student profile API"""
+        # Test with approved student (Test Student should exist after approval)
+        success1, response1 = self.run_api_test(
+            "Get Student Profile",
+            "GET", 
+            "students/Test Student",
+            200
+        )
+        
+        if success1:
+            required_fields = ['author_name', 'total_works', 'categories', 'works']
+            fields_check = all(field in response1 for field in required_fields)
+            self.log_result("Student Profile Fields Check", fields_check,
+                          f"Profile: {response1.get('author_name')} - {response1.get('total_works')} works")
+        
+        # Test with non-existent student
+        success2, _ = self.run_api_test(
+            "Non-existent Student Profile",
+            "GET",
+            "students/NonExistentStudent",
+            404
+        )
+        
+        return success1 and success2
+
     def run_all_tests(self):
         """Run all API tests in sequence"""
         print("🚀 Starting JNV Editorial Club API Tests")
