@@ -125,8 +125,8 @@ function Home() {
             </div>
             <div className="border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
               <img 
-                src="https://static.prod-images.emergentagent.com/jobs/0d0a2a6f-effd-4fec-a70e-5aa71a7c9085/images/b584d899eaaac1375072b861dca5f12137eb4560ad5fa70826b2fe734731b368.png" 
-                alt="Students engaged in literary activities" 
+                src="https://customer-assets.emergentagent.com/job_young-editorial-hub/artifacts/9bt7gpi5_IMG_20250902_180549.jpg" 
+                alt="Students of Jawahar Navodaya Vidyalaya Penta Sukma" 
                 className="w-full h-auto"
                 data-testid="hero-image"
               />
