@@ -1194,6 +1194,34 @@ function AdminDashboard() {
     }
   };
 
+  const handleApproveGallery = async (id) => {
+    const token = localStorage.getItem('admin_token');
+    try {
+      await axios.patch(`${API}/gallery/${id}/approve`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success('Gallery item approved!');
+      fetchData();
+    } catch (error) {
+      console.error('Error approving gallery:', error);
+      toast.error('Failed to approve gallery item');
+    }
+  };
+
+  const handleDeleteGallery = async (id) => {
+    const token = localStorage.getItem('admin_token');
+    try {
+      await axios.delete(`${API}/gallery/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success('Gallery item deleted');
+      fetchData();
+    } catch (error) {
+      console.error('Error deleting gallery:', error);
+      toast.error('Failed to delete gallery item');
+    }
+  };
+
   return (
     <div className="min-h-screen" style={{backgroundColor: '#F4F1EA'}} data-testid="admin-dashboard-page">
       <Header />
