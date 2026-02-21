@@ -340,6 +340,7 @@ function WorkDetail() {
   const [showShareMenu, setShowShareMenu] = useState(false);
   const navigate = useNavigate();
   const userId = getUserId();
+  const isAdmin = localStorage.getItem('admin_token');
 
   useEffect(() => {
     const fetchWork = async () => {
@@ -395,6 +396,24 @@ function WorkDetail() {
     } catch (error) {
       console.error('Error adding comment:', error);
       toast.error('Failed to add comment');
+    }
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    if (!window.confirm('Are you sure you want to delete this comment?')) {
+      return;
+    }
+    
+    try {
+      const token = localStorage.getItem('admin_token');
+      await axios.delete(`${API}/comments/${commentId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setComments(comments.filter(c => c.id !== commentId));
+      toast.success('Comment deleted');
+    } catch (error) {
+      console.error('Error deleting comment:', error);
+      toast.error('Failed to delete comment');
     }
   };
 
