@@ -608,6 +608,9 @@ class JNVEditorialAPITester:
         self.test_like_functionality()
         self.test_comment_functionality()
         
+        # New feature tests for iteration 4 (Admin comment moderation)
+        self.test_comment_deletion()
+        
         # Final summary
         print("=" * 60)
         print(f"📊 TEST SUMMARY")
