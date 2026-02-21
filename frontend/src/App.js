@@ -1249,15 +1249,35 @@ function AdminDashboard() {
           </div>
         )}
         
-        <h2 className="text-3xl font-bold mb-6" style={{fontFamily: 'Syne'}}>Pending Submissions</h2>
+        <div className="flex gap-4 mb-8" data-testid="admin-tabs">
+          <button
+            onClick={() => setActiveTab('submissions')}
+            className={`${activeTab === 'submissions' ? 'bg-black text-white' : 'bg-white text-black'} px-6 py-3 font-bold border-2 border-black transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,0.5)]`}
+            style={{fontFamily: 'Space Grotesk'}}
+            data-testid="tab-submissions"
+          >
+            Submissions ({pending.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('gallery')}
+            className={`${activeTab === 'gallery' ? 'bg-black text-white' : 'bg-white text-black'} px-6 py-3 font-bold border-2 border-black transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,0.5)]`}
+            style={{fontFamily: 'Space Grotesk'}}
+            data-testid="tab-gallery"
+          >
+            Gallery ({pendingGallery.length})
+          </button>
+        </div>
         
-        {pending.length === 0 ? (
-          <div className="bg-white border-2 border-black p-12 text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" data-testid="no-pending-message">
-            <p className="text-xl" style={{fontFamily: 'Space Grotesk'}}>No pending submissions</p>
-          </div>
-        ) : (
-          <div className="space-y-6" data-testid="pending-submissions-list">
-            {pending.map(sub => (
+        {activeTab === 'submissions' && (
+          <>
+            <h2 className="text-3xl font-bold mb-6" style={{fontFamily: 'Syne'}}>Pending Submissions</h2>
+            
+            {pending.length === 0 ? (
+              <div className="bg-white border-2 border-black p-12 text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" data-testid="no-pending-message">
+                <p className="text-xl" style={{fontFamily: 'Space Grotesk'}}>No pending submissions</p>
+              </div>
+            ) : (
+              <div className="space-y-6" data-testid="pending-submissions-list">{pending.map(sub => (
               <div key={sub.id} className="bg-white border-2 border-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" data-testid={`pending-submission-${sub.id}`}>
                 <div className="flex justify-between items-start mb-4">
                   <div>
