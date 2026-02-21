@@ -38,6 +38,8 @@ class JNVEditorialAPITester:
                 response = requests.post(url, json=data, headers=request_headers)
             elif method == 'PATCH':
                 response = requests.patch(url, json=data, headers=request_headers)
+            elif method == 'DELETE':
+                response = requests.delete(url, headers=request_headers)
 
             success = response.status_code == expected_status
             details = f"Status: {response.status_code}"
