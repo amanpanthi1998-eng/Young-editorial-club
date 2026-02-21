@@ -229,6 +229,60 @@ async def get_stats(username: str = Depends(verify_token)):
         rejected=rejected
     )
 
+@api_router.get("/search", response_model=List[Submission])
+async def search_submissions(q: str):
+    if not q or len(q.strip()) == 0:
+        return []
+    
+    query = {
+        "status": "approved",
+        "$or": [
+            {"title": {"$regex": q, "$options": "i"}},
+            {"title_hi": {"$regex": q, "$options": "i"}},
+            {"content": {"$regex": q, "$options": "i"}},
+            {"content_hi": {"$regex": q, "$options": "i"}},
+            {"author_name": {"$regex": q, "$options": "i"}}
+        ]
+    }
+    
+    submissions = await db.submissions.find(query, {"_id": 0}).sort("created_at", -1).to_list(100)
+    
+    for sub in submissions:
+        if isinstance(sub.get('created_at'), str):
+            sub['created_at'] = datetime.fromisoformat(sub['created_at'])
+        if sub.get('approved_at') and isinstance(sub['approved_at'], str):
+            sub['approved_at'] = datetime.fromisoformat(sub['approved_at'])
+    
+    return submissions
+
+@api_router.get("/students/{author_name}")
+async def get_student_profile(author_name: str):
+    submissions = await db.submissions.find(
+        {"author_name": author_name, "status": "approved"}, 
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(1000)
+    
+    if not submissions:
+        raise HTTPException(status_code=404, detail="Student not found")
+    
+    for sub in submissions:
+        if isinstance(sub.get('created_at'), str):
+            sub['created_at'] = datetime.fromisoformat(sub['created_at'])
+        if sub.get('approved_at') and isinstance(sub['approved_at'], str):
+            sub['approved_at'] = datetime.fromisoformat(sub['approved_at'])
+    
+    categories = {}
+    for sub in submissions:
+        cat = sub['category']
+        categories[cat] = categories.get(cat, 0) + 1
+    
+    return {
+        "author_name": author_name,
+        "total_works": len(submissions),
+        "categories": categories,
+        "works": submissions
+    }
+
 app.include_router(api_router)
 
 app.add_middleware(
