@@ -353,7 +353,140 @@ class JNVEditorialAPITester:
         
         return success1 and success2
 
-    def run_all_tests(self):
+    def test_like_functionality(self):
+        """Test like/unlike functionality on submissions"""
+        if not self.test_submission_id:
+            self.log_result("Like Functionality Test", False, "No submission ID available")
+            return False
+            
+        test_user_id = "test_user_123"
+        
+        # Test liking a submission
+        success1, response1 = self.run_api_test(
+            "Like Submission",
+            "POST",
+            f"submissions/{self.test_submission_id}/like",
+            200,
+            data={"user_id": test_user_id}
+        )
+        
+        if success1:
+            action_check = response1.get('action') == 'liked'
+            likes_check = response1.get('likes', 0) >= 1
+            user_liked_check = response1.get('user_liked') == True
+            self.log_result("Like Action Check", action_check and likes_check and user_liked_check,
+                          f"Action: {response1.get('action')}, Likes: {response1.get('likes')}, User liked: {response1.get('user_liked')}")
+        
+        # Test unliking the same submission
+        success2, response2 = self.run_api_test(
+            "Unlike Submission",
+            "POST",
+            f"submissions/{self.test_submission_id}/like",
+            200,
+            data={"user_id": test_user_id}
+        )
+        
+        if success2:
+            action_check = response2.get('action') == 'unliked'
+            user_liked_check = response2.get('user_liked') == False
+            self.log_result("Unlike Action Check", action_check and user_liked_check,
+                          f"Action: {response2.get('action')}, Likes: {response2.get('likes')}, User liked: {response2.get('user_liked')}")
+        
+        # Test liking again to leave it liked for frontend tests
+        success3, _ = self.run_api_test(
+            "Like Again for Frontend",
+            "POST",
+            f"submissions/{self.test_submission_id}/like",
+            200,
+            data={"user_id": test_user_id}
+        )
+        
+        # Test liking non-existent submission
+        success4, _ = self.run_api_test(
+            "Like Non-existent Submission",
+            "POST",
+            "submissions/non-existent-id/like",
+            404,
+            data={"user_id": test_user_id}
+        )
+        
+        return success1 and success2 and success3 and success4
+
+    def test_comment_functionality(self):
+        """Test comment functionality on submissions"""
+        if not self.test_submission_id:
+            self.log_result("Comment Functionality Test", False, "No submission ID available")
+            return False
+            
+        # Test adding a comment
+        comment_data = {
+            "author_name": "Test Commenter",
+            "comment_text": "This is a test comment on the submission. Great work!"
+        }
+        
+        success1, response1 = self.run_api_test(
+            "Add Comment to Submission",
+            "POST",
+            f"submissions/{self.test_submission_id}/comment",
+            200,
+            data=comment_data
+        )
+        
+        comment_id = None
+        if success1:
+            required_fields = ['id', 'submission_id', 'author_name', 'comment_text', 'created_at']
+            fields_check = all(field in response1 for field in required_fields)
+            comment_id = response1.get('id')
+            self.log_result("Comment Fields Check", fields_check,
+                          f"Comment ID: {comment_id}, Author: {response1.get('author_name')}")
+        
+        # Test getting comments for the submission
+        success2, response2 = self.run_api_test(
+            "Get Comments for Submission",
+            "GET",
+            f"submissions/{self.test_submission_id}/comments",
+            200
+        )
+        
+        if success2 and isinstance(response2, list):
+            comments_count = len(response2)
+            has_our_comment = any(c.get('id') == comment_id for c in response2) if comment_id else False
+            self.log_result("Comments Retrieval Check", comments_count >= 1 and has_our_comment,
+                          f"Found {comments_count} comments, our comment present: {has_our_comment}")
+        
+        # Test adding another comment (bilingual)
+        comment_data_hindi = {
+            "author_name": "हिंदी टिप्पणीकार",
+            "comment_text": "यह एक हिंदी टिप्पणी है। बहुत अच्छा काम!"
+        }
+        
+        success3, response3 = self.run_api_test(
+            "Add Hindi Comment",
+            "POST",
+            f"submissions/{self.test_submission_id}/comment",
+            200,
+            data=comment_data_hindi
+        )
+        
+        # Test commenting on non-existent submission
+        success4, _ = self.run_api_test(
+            "Comment on Non-existent Submission",
+            "POST",
+            "submissions/non-existent-id/comment",
+            404,
+            data=comment_data
+        )
+        
+        # Test invalid comment data (missing fields)
+        success5, _ = self.run_api_test(
+            "Invalid Comment Data",
+            "POST",
+            f"submissions/{self.test_submission_id}/comment",
+            422,
+            data={"author_name": "Test"}  # Missing comment_text
+        )
+        
+        return success1 and success2 and success3 and success4 and success5
         """Run all API tests in sequence"""
         print("🚀 Starting JNV Editorial Club API Tests")
         print(f"📍 Testing against: {self.base_url}")
